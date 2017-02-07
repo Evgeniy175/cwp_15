@@ -1,0 +1,8 @@
+{
+    "db": {
+        "host": "localhost",
+        "name": "pscpa_sem6_lab2",
+        "user": "NodeJS",
+        "pass": "NodeJS"
+    }
+}
