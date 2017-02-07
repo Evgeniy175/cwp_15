@@ -10,6 +10,8 @@ function AuthRouter(express, usersService) {
     //router.get('/autorize', auth);
     router.post('/autorize', auth);
 
+    return router;
+
     function register() {
         
     }

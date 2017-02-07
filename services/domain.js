@@ -42,18 +42,18 @@ class DomainService {
     readMany(params) {
         if (!params.page) params.page = 1;
         
-        let findOptions = _getReadManyOptions(params);
+        let findOptions = this._getReadManyOptions(params);
 
         return new Promise((resolve, reject) => {
             this.domainRepository
                 .findAndCountAll(findOptions)
-                .then(data => resolve(_getReadManyResults(params, data)))
+                .then(data => resolve(this._getReadManyResults(params, findOptions, data)))
                 .catch(reject);
         });
     }
 
     _getReadManyOptions(params) {
-        params = Object.assign({}, defaultOptions.readMany, params)
+        params = Object.assign({}, this.defaultOptions.readMany, params)
 
         let limit = parseInt(params.limit);
         let page = parseInt(params.page);
@@ -66,7 +66,7 @@ class DomainService {
         };
     }
 
-    _getReadManyResults(params, data) {
+    _getReadManyResults(params, findOptions, data) {
         return {
             portionNumber: params.page,
             nOfPortions: Math.ceil(data.count / findOptions.limit),

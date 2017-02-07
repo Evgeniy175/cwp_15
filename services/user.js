@@ -1,6 +1,6 @@
 class UserService {
-    constructor(userRepository, errors) {
-        this.userRepository = userRepository;
+    constructor(usersRepository, errors) {
+        this.usersRepository = usersRepository;
         this.errors = errors;
 
         this.defaultOptions = {
@@ -22,7 +22,7 @@ class UserService {
                 return;
             }
             
-            this.userRepository.create(user)
+            this.usersRepository.create(user)
                 .then(resolve)
                 .catch(reject);
         });
@@ -37,7 +37,7 @@ class UserService {
                 return;
             }
 
-            this.userRepository.findById(id)
+            this.usersRepository.findById(id)
                 .then((user) => {
                     if (user == null) reject(this.errors.notFound);
                     else resolve(user);
@@ -54,13 +54,13 @@ class UserService {
         return new Promise((resolve, reject) => {
             this.usersRepository
                 .findAndCountAll(findOptions)
-                .then(data => resolve(this._getReadManyResults(params, data)))
+                .then(data => resolve(this._getReadManyResults(params, findOptions, data)))
                 .catch(reject);
         });
     }
 
     _getReadManyOptions(params) {
-        params = Object.assign({}, defaultOptions.readMany, params)
+        params = Object.assign({}, this.defaultOptions.readMany, params)
 
         let limit = parseInt(params.limit);
         let page = parseInt(params.page);
@@ -73,7 +73,7 @@ class UserService {
         };
     }
 
-    _getReadManyResults(params, data) {
+    _getReadManyResults(params, findOptions, data) {
         return {
             portionNumber: params.page,
             nOfPortions: Math.ceil(data.count / findOptions.limit),
@@ -107,7 +107,7 @@ class UserService {
 
     remove(id) {
         return new Promise((resolve, reject) => {
-            this.userRepository.destroy({ where: { id } })
+            this.usersRepository.destroy({ where: { id } })
                 .then(resolve)
                 .catch(reject);
         });
