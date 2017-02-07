@@ -1,6 +1,6 @@
 class DomainService {
-    constructor(domenRepository, errors) {
-        this.domenRepository = domenRepository;
+    constructor(domainRepository, errors) {
+        this.domainRepository = domainRepository;
         this.errors = errors;
 
         this.defaultOptions = {
@@ -13,9 +13,9 @@ class DomainService {
         };
     }
 
-    create(domen) {
+    create(domain) {
         return new Promise((resolve, reject) => {
-            this.domenRepository.create(domen)
+            this.domainRepository.create(domain)
                 .then(resolve)
                 .catch(reject);
         });
@@ -30,10 +30,10 @@ class DomainService {
                 return;
             }
 
-            this.domenRepository.findById(id)
-                .then((domen) => {
-                    if (domen == null) reject(this.errors.notFound);
-                    else resolve(domen);
+            this.domainRepository.findById(id)
+                .then((domain) => {
+                    if (domain == null) reject(this.errors.notFound);
+                    else resolve(domain);
                 })
                 .catch(reject);
         });
@@ -45,7 +45,7 @@ class DomainService {
         let findOptions = _getReadManyOptions(params);
 
         return new Promise((resolve, reject) => {
-            this.domenRepository
+            this.domainRepository
                 .findAndCountAll(findOptions)
                 .then(data => resolve(_getReadManyResults(params, data)))
                 .catch(reject);
@@ -74,12 +74,56 @@ class DomainService {
         };
     }
 
-    update(domen) {
+    update(params) {
+        let d = {
+            name: params.name
+        };
+        let validationErrors = this._getValidationErrors(d);
+        
+        return new Promise((resolve, reject) => {
+            if (validationErrors.length > 0) {
+                reject(validationErrors);
+                return;
+            }
 
+            if (params.id == undefined) {
+                reject(this.errors.invalidEntity);
+                return;
+            }
+            
+            this.domainRepository.update(u, { where: { id: params.id }, limit: 1 });
+        });
     }
 
     remove(id) {
+        return new Promise((resolve, reject) => {
+            this.domainRepository.destroy({ where: { id } })
+                .then(resolve)
+                .catch(reject);
+        });
+    }
 
+    isAcceptable(domain) {
+        // todo
+    }
+
+    _getValidationErrors(domain) {
+        let validationErrors = this.validate(domain).join('; ');
+
+        if (validationErrors.length == 0) return "";
+
+        let rc = this.errors.invalidEntity;
+        rc.message = rc.message + ': ' + validationErrors;
+        return rc;
+    }
+
+    validate(domain) {
+        let rc = [];
+
+        if (domain.name == undefined || domain.name == "")
+            rc.push('Domain name not set');
+
+        return rc;
     }
 }
 

@@ -28,16 +28,6 @@ class UserService {
         });
     }
 
-    _getValidationErrors(user) {
-        let validationErrors = this.validate(user).join('; ');
-
-        if (validationErrors.length == 0) return "";
-
-        let rc = this.errors.invalidEntity;
-        rc.message = rc.message + ': ' + validationErrors;
-        return rc;
-    }
-
     read(id) {
         id = parseInt(id);
 
@@ -91,16 +81,27 @@ class UserService {
         };
     }
 
-    update(user) {
+    update(params) {
         let u = {
-            password: params.password,
             email: params.email,
+            password: params.password,
             firstname: params.firstname,
             lastname: params.lastname
         };
+        let validationErrors = this._getValidationErrors(u);
         
         return new Promise((resolve, reject) => {
+            if (validationErrors.length > 0) {
+                reject(validationErrors);
+                return;
+            }
 
+            if (params.id == undefined) {
+                reject(this.errors.invalidEntity);
+                return;
+            }
+            
+            this.usersRepository.update(u, { where: { id: params.id }, limit: 1 });
         });
     }
 
@@ -112,17 +113,27 @@ class UserService {
         });
     }
 
+    _getValidationErrors(user) {
+        let validationErrors = this.validate(user).join('; ');
+
+        if (validationErrors.length == 0) return "";
+
+        let rc = this.errors.invalidEntity;
+        rc.message = rc.message + ': ' + validationErrors;
+        return rc;
+    }
+
     validate(user) {
         let rc = [];
 
         if (user.email == undefined || user.email == "")
-            rc.push("Email not set or not set");
+            rc.push('Email not set');
         if (user.password == undefined || user.password == "")
-            rc.push("Password not set or not set");
+            rc.push('Password not set');
         if (user.firstname == undefined || user.firstname == "")
-            rc.push("First not set or name not set");
+            rc.push('First name not set');
         if (user.lastname == undefined || user.lastname == "")
-            rc.push("Last not set or name not set");
+            rc.push('Last name not set');
 
         return rc;
     }

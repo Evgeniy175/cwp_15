@@ -11,7 +11,7 @@ function AuthRouter(express, usersService) {
     router.post('/autorize', auth);
 
     function register() {
-        usersService.
+        
     }
 
     function auth() {
