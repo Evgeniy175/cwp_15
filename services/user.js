@@ -17,7 +17,7 @@ class UserService {
         let validationErrors = this._getValidationErrors(user);
 
         return new Promise((resolve, reject) => {
-            if (validationErrors.length > 0) {
+            if (validationErrors != "") {
                 reject(validationErrors);
                 return;
             }
@@ -125,6 +125,8 @@ class UserService {
 
     validate(user) {
         let rc = [];
+
+        if (user == undefined) return ["Please, send user data"];
 
         if (user.email == undefined || user.email == "")
             rc.push('Email not set');

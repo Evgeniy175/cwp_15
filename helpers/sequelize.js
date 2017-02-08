@@ -13,13 +13,15 @@ function DbContext(Sequelize, config) {
 
     const Users = require('../models/user')(Sequelize, sequelize);
     const Domains = require('../models/domain')(Sequelize, sequelize);
-    const UserDomain = require('../models/userDomains')(Sequelize, sequelize);
+    const UserDomains = require('../models/userDomains')(Sequelize, sequelize);
+    const UserPayments = require('../models/userPayments')(Sequelize, sequelize);
 
-    Users.belongsToMany(Domains, { through: UserDomain });
+    Users.belongsToMany(Domains, { through: UserPayments });
 
     return {
       users: Users,
       domains: Domains,
+      userPayments: UserPayments,
       
       sequelize: sequelize
     }

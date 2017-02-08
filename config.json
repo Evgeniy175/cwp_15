@@ -4,5 +4,12 @@
         "name": "pscpa_sem6_lab2",
         "user": "NodeJS",
         "pass": "NodeJS"
+    },
+    "cookie": {
+        "authKey": "__sample_auth_id",
+        "authValue": "signed"
+    },
+    "domainRequest": {
+        "key": "fb7aca826b084569a50cfb3157e924ae"
     }
 }

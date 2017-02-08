@@ -1,11 +1,11 @@
 function UserRouter(express, usersService) {
     let router = express.Router();
 
+    router.get('/:id', read);
     router.get('/', readMany);
     router.post('/', create);
     router.put('/:id', update);
     router.delete('/:id', remove);
-    router.get('/:id', read);
 
     return router;
 

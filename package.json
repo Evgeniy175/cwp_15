@@ -9,9 +9,12 @@
   "author": "E.Ryabchenko",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.16.0",
+    "cookie-parser": "^1.4.3",
     "express": "^4.14.1",
     "jsonwebtoken": "^7.2.1",
     "mysql": "^2.13.0",
+    "request": "^2.79.0",
     "sequelize": "^3.30.1"
   }
 }

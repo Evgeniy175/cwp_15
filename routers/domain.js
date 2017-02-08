@@ -2,10 +2,10 @@ function UserRouter(express, domainsService) {
     let router = express.Router();
 
     router.get('/', readMany);
+    router.get('/:id', read);
     router.post('/', create);
     router.put('/:id', update);
     router.delete('/:id', remove);
-    router.get('/:id', read);
 
     return router;
 

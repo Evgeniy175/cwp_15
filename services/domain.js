@@ -1,6 +1,8 @@
 class DomainService {
-    constructor(domainRepository, errors) {
+    constructor(request, domainRepository, userPaymentsRepository, config, errors) {
+        this.request = request;
         this.domainRepository = domainRepository;
+        this.config = config;
         this.errors = errors;
 
         this.defaultOptions = {
@@ -75,9 +77,7 @@ class DomainService {
     }
 
     update(params) {
-        let d = {
-            name: params.name
-        };
+        let d = { name: params.name };
         let validationErrors = this._getValidationErrors(d);
         
         return new Promise((resolve, reject) => {
@@ -104,7 +104,54 @@ class DomainService {
     }
 
     isAcceptable(domain) {
+        let isDomainGood = domain != undefined && domain.length > 0;
+
+        return new Promise((resolve, reject) => {
+            if (!isDomainGood) reject(errors.badDomain);
+
+            this.request('https://api.domainr.com/v2/status?domain=' + domain + '&client_id=' + this.config.domainRequest.key, function (error, response, body) {
+                console.log(response.body);
+            });
+        });
+    }
+
+    order(userId, domain) {
         // todo
+    }
+
+    pay(userId, domainId, sum) {
+        let validationErrors = _validatePayment(userId, domainId, sum);
+        let payment = { userId, domainId, sum };
+
+        return new Promise((resolve, reject) => {
+            if (validationErrors.length > 0) {
+                reject(validationErrors);
+            } else {
+                userPaymentsRepository.create(payment)
+                    .then(resolve)
+                    .catch(reject);
+            }
+        });
+    }
+
+    _getValidationErrors(userId, domainId, sum) {
+        let validationErrors = this._validatePayment(userId, domainId, sum).join('; ');
+
+        if (validationErrors.length == 0) return "";
+
+        let rc = this.errors.invalidEntity;
+        rc.message = rc.message + ': ' + validationErrors;
+        return rc;
+    }
+
+    _validatePayment(userId, domainId, sum) {
+        let rc = [];
+
+        if (userId == undefined || userId == "") rc.push("User not set");
+        if (domainId == undefined || domainId == "") rc.push("Domain not set");
+        if (sum == undefined || isNaN(sum) || sum <= 0) rc.push("Sum incorrect");
+
+        return rc;
     }
 
     _getValidationErrors(domain) {

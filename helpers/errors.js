@@ -37,5 +37,10 @@ module.exports = {
         message: 'Unprocessable entity',
         code: 'invalid_entity',
         status: 422
+    },
+    badDomain: {
+        message: 'Bad domain',
+        code: 'bad_domain_requested',
+        status: 400
     }
 };
