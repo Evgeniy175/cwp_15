@@ -1,19 +1,19 @@
 function AuthRouter(express, sessionsService, usersService, config, errors) {
-    let freeAccessRoutes = ["/signUp", "/auth", "/signIn"];
+    let freeAccessRoutes = ["/sign-up", "/auth", "/sign-in", "/domain"];
 
     let router = express.Router();
 
     router.get('*', checkPermissions);
     router.post('*', checkPermissions);
 
-    router.get('/signUp', signUp);
-    router.post('/signUp', signUp);
+    router.get('/sign-up', signUp);
+    router.post('/sign-up', signUp);
 
     router.get('/auth', auth);
     router.post('/auth', auth);
 
-    router.get('/signIn', signIn);
-    router.post('/signIn', signIn);
+    router.get('/sign-in', signIn);
+    router.post('/sign-in', signIn);
 
     return router;
 
@@ -24,7 +24,7 @@ function AuthRouter(express, sessionsService, usersService, config, errors) {
         if (isFreeAccessRoute || isUserSigned) {
             next();
         } else {
-            res.json(errors.wrongCredentials);
+            res.json(errors.accessDenied);
         }
     }
 
@@ -40,7 +40,10 @@ function AuthRouter(express, sessionsService, usersService, config, errors) {
 
     function signIn(req, res, next) {
         sessionsService.signIn(req.body)
-            .then((data) => res.json(data))
+            .then((userId) => {
+                res.cookie(config.cookie.authKey, userId, {signed: true});
+                res.json(userId);
+            })
             .catch((err) => res.error(err));
     }
 }

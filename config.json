@@ -6,8 +6,7 @@
         "pass": "NodeJS"
     },
     "cookie": {
-        "authKey": "__sample_auth_id",
-        "authValue": "signed"
+        "authKey": "__auth_key"
     },
     "domainRequest": {
         "key": "fb7aca826b084569a50cfb3157e924ae"

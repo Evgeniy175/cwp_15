@@ -15,8 +15,7 @@ class SessionService {
 
             this.usersRepository.findOne( { where: { email: u.email } })
                 .then((user) => {
-                    if (user == null || user.password != u.password) {
-                        res.cookie(config.cookie.authKey, config.cookie.authValue);
+                    if (user == null || user.dataValues.password !== u.password) {
                         reject(this.errors.wrongCredentials);
                     } else {
                         resolve(user.dataValues.id);

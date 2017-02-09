@@ -1,7 +1,10 @@
 class DomainService {
-    constructor(request, domainRepository, userPaymentsRepository, config, errors) {
+    constructor(request, domainRepository, userRepository, userDomainsRepository, userPaymentsRepository, config, errors) {
         this.request = request;
         this.domainRepository = domainRepository;
+        this.userRepository = userRepository;
+        this.userDomainsRepository = userDomainsRepository;
+        this.userPaymentsRepository = userPaymentsRepository;
         this.config = config;
         this.errors = errors;
 
@@ -103,38 +106,80 @@ class DomainService {
         });
     }
 
-    isAcceptable(domain) {
+    isAvailable(domain) {
         let isDomainGood = domain != undefined && domain.length > 0;
+        let url = 'https://api.domainr.com/v2/status?domain=' + domain + '&client_id=' + this.config.domainRequest.key;
 
         return new Promise((resolve, reject) => {
             if (!isDomainGood) reject(errors.badDomain);
 
-            this.request('https://api.domainr.com/v2/status?domain=' + domain + '&client_id=' + this.config.domainRequest.key, function (error, response, body) {
-                console.log(response.body);
+            this.request(url, function (err, response, body) {
+                if (err) reject(err);
+
+                let result = JSON.parse(response.body);
+                resolve(result.status[0].status != 'active');
             });
         });
     }
 
-    order(userId, domain) {
-        // todo
+    buy(userId, domain) {
+        return new Promise((resolve, reject) => {
+            if (userId == undefined) { reject(this.errors.invalidId); return; }
+            if (domain == undefined || domain == '') { reject(this.errors.badDomain); return; }
+
+            let validationErrors = this._getValidationErrors(domain);
+
+            if (validationErrors.length > 0) { reject(validationErrors); return; }
+
+            this.userRepository.findById(userId)
+                .then((user) => {
+                    if (user == undefined) { reject(this.errors.invalidId); }
+                    else { return this._tryAddUserDomain(user, domain); }
+                })
+                .then(resolve)
+                .catch(reject);
+        });
+    }
+
+    _tryAddUserDomain(user, domain) {
+        let isAvailableRemote = this.isAvailable(domain);
+        let isAvailableLocal = this.domainRepository.find({ where: { name: domain } });
+        
+        return Promise.all([isAvailableRemote, isAvailableLocal])
+            .then(values => {
+                if (!values[0] || values[1] != null) throw this.errors.domainNotAvailable;
+
+                user.createDomain({ name: domain });
+            });
     }
 
     pay(userId, domainId, sum) {
-        let validationErrors = _validatePayment(userId, domainId, sum);
-        let payment = { userId, domainId, sum };
+        let validationErrors = this._getPaymentValidationErrors(userId, domainId, sum);
 
         return new Promise((resolve, reject) => {
-            if (validationErrors.length > 0) {
-                reject(validationErrors);
-            } else {
-                userPaymentsRepository.create(payment)
+            if (validationErrors != "") { reject(validationErrors); }
+            else {
+                this._tryAddUserPayment(userId, domainId, sum)
                     .then(resolve)
                     .catch(reject);
             }
         });
     }
 
-    _getValidationErrors(userId, domainId, sum) {
+    _tryAddUserPayment(userId, domainId, sum) {
+        return new Promise ((resolve, reject) => {
+            this.userDomainsRepository.find({ where: { userId, domainId } })
+                .then((ud) => {
+                    if (ud == null) { reject(this.errors.badUserDomain); }
+
+                    this.userPaymentsRepository.create({ userDomainId: ud.dataValues.id, sum });
+                })
+                .then(resolve)
+                .catch(reject);
+        });
+    }
+
+    _getPaymentValidationErrors(userId, domainId, sum) {
         let validationErrors = this._validatePayment(userId, domainId, sum).join('; ');
 
         if (validationErrors.length == 0) return "";
@@ -167,8 +212,7 @@ class DomainService {
     validate(domain) {
         let rc = [];
 
-        if (domain.name == undefined || domain.name == "")
-            rc.push('Domain name not set');
+        if (domain.name == undefined || domain.name == "") rc.push('Domain name not set');
 
         return rc;
     }

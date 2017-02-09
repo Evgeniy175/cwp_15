@@ -42,5 +42,15 @@ module.exports = {
         message: 'Bad domain',
         code: 'bad_domain_requested',
         status: 400
+    },
+    domainNotAvailable: {
+        message: 'Domain not available',
+        code: 'domain_not_available',
+        status: 400
+    },
+    badUserDomain: {
+        message: 'User doesn\'t have selected domain',
+        code: 'bad_user_domain',
+        status: 400
     }
 };

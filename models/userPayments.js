@@ -1,12 +1,11 @@
  function Payment(Sequelize, sequelize) {
-    return sequelize.define('payments', {
+    return sequelize.define('userpayments', {
         id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        userId: Sequelize.INTEGER,
-        domainId: Sequelize.INTEGER,
+        userDomainId: Sequelize.INTEGER,
         sum: Sequelize.FLOAT
     });
 };

@@ -1,6 +1,12 @@
  function UserDomains(Sequelize, sequelize) {
     return sequelize.define('userdomains', {
-        ownedOn: Sequelize.DATE
+        id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        userId: Sequelize.INTEGER,
+        domainId: Sequelize.INTEGER
     });
 };
 

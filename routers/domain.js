@@ -2,16 +2,18 @@ function UserRouter(express, domainsService) {
     let router = express.Router();
 
     router.get('/', readMany);
+    router.get('/is-available', isAvailable)
     router.get('/:id', read);
+
     router.post('/', create);
+    router.post('/buy', buy)
+    router.post('/pay', pay);
+
     router.put('/:id', update);
+
     router.delete('/:id', remove);
 
     return router;
-
-    function create(req, res) {
-        promiseResolver(domainsService.create(req.body), res);
-    }
 
     function readMany(req, res) {
         promiseResolver(domainsService.readMany(req.query), res);
@@ -19,6 +21,27 @@ function UserRouter(express, domainsService) {
 
     function read(req, res) {
         promiseResolver(domainsService.read(req.params.id), res);
+    }
+
+    function isAvailable(req, res) {
+        promiseResolver(domainsService.isAvailable(req.query.domain), res);
+    }
+
+    function create(req, res) {
+        promiseResolver(domainsService.create(req.body), res);
+    }
+
+    function buy(req, res) {
+        let uId = req.signedCookies.__auth_key;
+        let domain = req.body.domain;
+        promiseResolver(domainsService.buy(uId, domain), res);
+    }
+
+    function pay(req, res) {
+        let uId = req.signedCookies.__auth_key;
+        let domainId = req.body.domainId;
+        let sum = req.body.sum;
+        promiseResolver(domainsService.pay(uId, domainId, sum), res);
     }
 
     function update(req, res) {

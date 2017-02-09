@@ -10,7 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.16.0",
+    "connect": "^3.5.0",
     "cookie-parser": "^1.4.3",
+    "cookie-session": "^2.0.0-alpha.2",
     "express": "^4.14.1",
     "jsonwebtoken": "^7.2.1",
     "mysql": "^2.13.0",
