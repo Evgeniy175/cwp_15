@@ -6,11 +6,9 @@ function AuthRouter(express, sessionsService, usersService, config, errors) {
     router.get('*', checkPermissions);
     router.post('*', checkPermissions);
 
-    router.get('/sign-up', signUp);
     router.post('/sign-up', signUp);
-
-    router.get('/sign-in', signIn);
     router.post('/sign-in', signIn);
+    router.post('/logout', logout);
 
     return router;
 
@@ -25,19 +23,24 @@ function AuthRouter(express, sessionsService, usersService, config, errors) {
         }
     }
 
-    function signUp(req, res, next) {
+    function signUp(req, res) {
         usersService.create(req.body)
             .then((data) => res.json(data))
             .catch((err) => res.error(err));
     }
 
-    function signIn(req, res, next) {
+    function signIn(req, res) {
         sessionsService.signIn(req.body)
             .then((userId) => {
                 res.cookie(config.cookie.authKey, userId, {signed: true});
                 res.json(userId);
             })
             .catch((err) => res.error(err));
+    }
+
+    function logout(req, res) {
+        res.cookie(config.cookie.authKey, '');
+        res.end();
     }
 }
 
