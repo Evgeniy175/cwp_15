@@ -10,5 +10,8 @@
     },
     "domainRequest": {
         "key": "fb7aca826b084569a50cfb3157e924ae"
+    },
+    "jwt": {
+        "secret": "mega_secure_key"
     }
 }

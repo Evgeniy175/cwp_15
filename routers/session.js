@@ -9,9 +9,6 @@ function AuthRouter(express, sessionsService, usersService, config, errors) {
     router.get('/sign-up', signUp);
     router.post('/sign-up', signUp);
 
-    router.get('/auth', auth);
-    router.post('/auth', auth);
-
     router.get('/sign-in', signIn);
     router.post('/sign-in', signIn);
 
@@ -32,10 +29,6 @@ function AuthRouter(express, sessionsService, usersService, config, errors) {
         usersService.create(req.body)
             .then((data) => res.json(data))
             .catch((err) => res.error(err));
-    }
-
-    function auth(req, res, next) {
-        // todo
     }
 
     function signIn(req, res, next) {

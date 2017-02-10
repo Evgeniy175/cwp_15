@@ -1,6 +1,8 @@
 class UserService {
-    constructor(usersRepository, errors) {
+    constructor(usersRepository, jwt, config, errors) {
         this.usersRepository = usersRepository;
+        this.jwt = jwt;
+        this.config = config;
         this.errors = errors;
 
         this.defaultOptions = {
@@ -21,11 +23,17 @@ class UserService {
                 reject(validationErrors);
                 return;
             }
+
+            this._encodeUserPassword(user);
             
             this.usersRepository.create(user)
                 .then(resolve)
                 .catch(reject);
         });
+    }
+
+    _encodeUserPassword(user) {
+        user.password = this.jwt.sign(user.password, this.config.jwt.secret);
     }
 
     read(id) {
