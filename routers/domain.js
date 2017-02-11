@@ -1,4 +1,4 @@
-function UserRouter(express, domainsService) {
+function UserRouter(express, domainsService, config) {
     let router = express.Router();
 
     router.get('/', readMany);
@@ -7,7 +7,7 @@ function UserRouter(express, domainsService) {
 
     router.post('/', create);
     router.post('/buy', buy)
-    router.post('/pay', pay);
+    router.post('/:id/pay', pay);
 
     router.put('/:id', update);
 
@@ -32,28 +32,24 @@ function UserRouter(express, domainsService) {
     }
 
     function buy(req, res) {
-        let uId = req.signedCookies.__auth_key;
+        let uId = req.decodedToken;
         let domain = req.body.domain;
         promiseResolver(domainsService.buy(uId, domain), res);
     }
 
     function pay(req, res) {
-        let uId = req.signedCookies.__auth_key;
-        let domainId = req.body.domainId;
+        let uId = req.decodedToken;
+        let domainId = req.params.id;
         let sum = req.body.sum;
         promiseResolver(domainsService.pay(uId, domainId, sum), res);
     }
 
     function update(req, res) {
-        promiseResolver(domainsService.update(req.body), res);
+        promiseResolver(domainsService.update(req.params.id, req.body), res);
     }
 
     function remove(req, res) {
-        promiseResolver(domainsService.remove(req.body.id), res);
-    }
-
-    function search(req, res) {
-        promiseResolver(domainsService.search(req.query), res);
+        promiseResolver(domainsService.remove(req.params.id), res);
     }
 
     function promiseResolver(promise, res) {

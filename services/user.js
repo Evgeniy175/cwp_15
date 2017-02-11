@@ -89,7 +89,7 @@ class UserService {
         };
     }
 
-    update(params) {
+    update(id, params) {
         let u = {
             email: params.email,
             password: params.password,
@@ -104,12 +104,14 @@ class UserService {
                 return;
             }
 
-            if (params.id == undefined) {
+            if (id == undefined) {
                 reject(this.errors.invalidEntity);
                 return;
             }
             
-            this.usersRepository.update(u, { where: { id: params.id }, limit: 1 });
+            this.usersRepository.update(u, { where: { id }, limit: 1 })
+                .then(resolve)
+                .catch(reject);
         });
     }
 

@@ -22,15 +22,11 @@ function UserRouter(express, usersService) {
     }
 
     function update(req, res) {
-        promiseResolver(usersService.update(req.body), res);
+        promiseResolver(usersService.update(req.params.id, req.body), res);
     }
 
     function remove(req, res) {
-        promiseResolver(usersService.remove(req.body.id), res);
-    }
-
-    function search(req, res) {
-        promiseResolver(usersService.search(req.query), res);
+        promiseResolver(usersService.remove(req.params.id), res);
     }
 
     function promiseResolver(promise, res) {

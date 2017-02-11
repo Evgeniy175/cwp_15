@@ -1,5 +1,5 @@
-function AuthRouter(express, sessionsService, usersService, config, errors) {
-    let freeAccessRoutes = ["/sign-up", "/auth", "/sign-in", "/domain"];
+function AuthRouter(express, sessionsService, usersService, jwt, config, errors) {
+    let freeAccessRoutes = ["/sign-up", "/sign-in", "/logout"];
 
     let router = express.Router();
 
@@ -7,20 +7,21 @@ function AuthRouter(express, sessionsService, usersService, config, errors) {
     router.post('*', checkPermissions);
 
     router.post('/sign-up', signUp);
+
     router.post('/sign-in', signIn);
-    router.post('/logout', logout);
+
+    router.get('/logout', logout);
 
     return router;
 
     function checkPermissions(req, res, next) {
         let isFreeAccessRoute = freeAccessRoutes.some((elem) => req.url.startsWith(elem));
-        let isUserSigned = req.signedCookies[config.cookie.authKey] === config.cookie.authValue;
+        let isUserSigned = req.signedCookies[config.cookies.tokenKey] == undefined ? false : true;
+        
+        if (isUserSigned) req.decodedToken = jwt.verify(req.signedCookies[config.cookies.tokenKey], config.jwt.secret);
 
-        if (isFreeAccessRoute || isUserSigned) {
-            next();
-        } else {
-            res.json(errors.accessDenied);
-        }
+        if (isFreeAccessRoute || isUserSigned) next();
+        else res.json(errors.accessDenied);
     }
 
     function signUp(req, res) {
@@ -32,14 +33,15 @@ function AuthRouter(express, sessionsService, usersService, config, errors) {
     function signIn(req, res) {
         sessionsService.signIn(req.body)
             .then((userId) => {
-                res.cookie(config.cookie.authKey, userId, {signed: true});
+                let token = jwt.sign(userId, config.jwt.secret);
+                res.cookie(config.cookies.tokenKey, token, {signed: true});
                 res.json(userId);
             })
             .catch((err) => res.error(err));
     }
 
     function logout(req, res) {
-        res.cookie(config.cookie.authKey, '');
+        res.cookie(config.cookies.tokenKey, '');
         res.end();
     }
 }

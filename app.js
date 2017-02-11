@@ -29,16 +29,14 @@ const sessionsService = new SessionService(context.users, Jwt, config, errors);
 const usersService = new UserService(context.users, Jwt, config, errors);
 const domainsService = new DomainService(Request, context.domains, context.users, context.userDomains, context.userPayments, config, errors);
 
-const sessionRouter = new SessionRouter(Express, sessionsService, usersService, config, errors);
+const sessionRouter = new SessionRouter(Express, sessionsService, usersService, Jwt, config, errors);
 const userRouter = new UserRouter(Express, usersService);
-const domainRouter = new DomainRouter(Express, domainsService);
+const domainRouter = new DomainRouter(Express, domainsService, config);
 
 // -- // -- // -- // -- // -- // -- // -- // -- // -- // -- // -- // -- // -- //
 
-app.set('secret', config.jwt.secret)
-
 app.use(BodyParser.json());
-app.use(CookieParser(config.cookie.authKey));
+app.use(CookieParser(config.cookies.secret));
 
 app.use('/', sessionRouter);
 app.use('/users', userRouter);

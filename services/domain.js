@@ -79,7 +79,7 @@ class DomainService {
         };
     }
 
-    update(params) {
+    update(id, params) {
         let d = { name: params.name };
         let validationErrors = this._getValidationErrors(d);
         
@@ -89,12 +89,14 @@ class DomainService {
                 return;
             }
 
-            if (params.id == undefined) {
+            if (id == undefined) {
                 reject(this.errors.invalidEntity);
                 return;
             }
             
-            this.domainRepository.update(u, { where: { id: params.id }, limit: 1 });
+            this.domainRepository.update(d, { where: { id }, limit: 1 })
+                .then(resolve)
+                .catch(reject);
         });
     }
 

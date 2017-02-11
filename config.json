@@ -5,8 +5,9 @@
         "user": "NodeJS",
         "pass": "NodeJS"
     },
-    "cookie": {
-        "authKey": "__auth_key"
+    "cookies": {
+        "tokenKey": "token_key",
+        "secret": "token_secret"
     },
     "domainRequest": {
         "key": "fb7aca826b084569a50cfb3157e924ae"
