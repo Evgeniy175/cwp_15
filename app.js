@@ -4,6 +4,7 @@ const Sequelize = require('sequelize');
 const Jwt = require('jsonwebtoken');
 const CookieParser = require('cookie-parser');
 const BodyParser = require('body-parser');
+const BCrypt = require('bcryptjs');
 
 const Request = require('request');
 
@@ -25,8 +26,8 @@ const errors = require('./helpers/errors');
 const app = Express();
 const context = new DbContext(Sequelize, config);
 
-const sessionsService = new SessionService(context.users, Jwt, config, errors);
-const usersService = new UserService(context.users, Jwt, config, errors);
+const sessionsService = new SessionService(context.users, BCrypt, config, errors);
+const usersService = new UserService(context.users, BCrypt, config, errors);
 const domainsService = new DomainService(Request, context.domains, context.users, context.userDomains, context.userPayments, config, errors);
 
 const sessionRouter = new SessionRouter(Express, sessionsService, usersService, Jwt, config, errors);

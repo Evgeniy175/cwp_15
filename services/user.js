@@ -1,7 +1,7 @@
 class UserService {
-    constructor(usersRepository, jwt, config, errors) {
+    constructor(usersRepository, bcrypt, config, errors) {
         this.usersRepository = usersRepository;
-        this.jwt = jwt;
+        this.bcrypt = bcrypt;
         this.config = config;
         this.errors = errors;
 
@@ -33,7 +33,8 @@ class UserService {
     }
 
     _encodeUserPassword(user) {
-        user.password = this.jwt.sign(user.password, this.config.jwt.secret);
+        let salt = this.bcrypt.genSaltSync(10);
+        user.password = this.bcrypt.hashSync(user.password, salt);
     }
 
     read(id) {
@@ -96,6 +97,7 @@ class UserService {
             firstname: params.firstname,
             lastname: params.lastname
         };
+
         let validationErrors = this._getValidationErrors(u);
         
         return new Promise((resolve, reject) => {
@@ -109,6 +111,8 @@ class UserService {
                 return;
             }
             
+            this._encodeUserPassword(u);
+
             this.usersRepository.update(u, { where: { id }, limit: 1 })
                 .then(resolve)
                 .catch(reject);

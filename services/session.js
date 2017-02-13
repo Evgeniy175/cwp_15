@@ -1,7 +1,7 @@
 class SessionService {
-    constructor(usersRepository, jwt, config, errors) {
+    constructor(usersRepository, bcrypt, config, errors) {
         this.usersRepository = usersRepository;
-        this.jwt = jwt;
+        this.bcrypt = bcrypt;
         this.config = config;
         this.errors = errors;
     }
@@ -16,10 +16,8 @@ class SessionService {
                 .then((user) => {
                     if (user == null) { reject(this.errors.wrongCredentials); return; }
 
-                    let dbPassword = this.jwt.verify(user.dataValues.password, this.config.jwt.secret);
-
-                    if (dbPassword !== u.password) { reject(this.errors.wrongCredentials); }
-                    else { resolve(user.dataValues.id); }
+                    if (this.bcrypt.compareSync(u.password, user.dataValues.password)) { resolve(user.dataValues.id); }
+                    else { reject(this.errors.wrongCredentials); }
                 })
                 .catch(reject);
         });
