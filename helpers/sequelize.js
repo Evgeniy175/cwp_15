@@ -17,6 +17,8 @@ function DbContext(Sequelize, config) {
     const UserPayments = require('../models/userPayments')(Sequelize, sequelize);
 
     Users.belongsToMany(Domains, { through: UserDomains });
+    
+    UserDomains.hasMany(UserPayments, { foreignKey: 'userDomainId', as: 'payments' });
 
     return {
       users: Users,
