@@ -21,17 +21,16 @@ class PaymentService {
             if (userId == null || userId == undefined) reject(this.errors.invalidId);
 
             this.userDomainsRepository.findOne({where: {userId, domainId}})
-                .then(ud => { ud.getPayments().then(p => { resolve(this._getPaymentsData(p)); }) })
+                .then(ud => resolve(this._getPaymentsData(ud)))
                 .catch(reject);
         });
     }
 
-    _getPaymentsData(payments) {
-        let rc = [];
-
-        for (let p of payments) rc.push(p.dataValues);
-
-        return rc;
+    _getPaymentsData(userDomain) {
+        return new Promise((resolve, reject) => {
+            userDomain.getPayments()
+                .then(p => { resolve(p.map(elem => elem.dataValues)); })
+        });
     }
 
     pay(userId, domainId, sum) {
