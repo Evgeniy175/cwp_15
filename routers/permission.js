@@ -1,4 +1,4 @@
-function PaymentRouter(express, paymentsService, config) {
+function PermissionRouter(express, jwt, config, errors) {
     const resolvers = {
         'xml': promiseResolverXml,
         'json': promiseResolverJson
@@ -7,27 +7,22 @@ function PaymentRouter(express, paymentsService, config) {
     const defaultResolver = 'json';
 
     let router = express.Router();
-    
-    router.get('/', readAllUserPaymentsForDomain);
-    router.post('/:userId', pay);
+
+    router.all('*', checkPermissions);
 
     return router;
 
-    function readAllUserPaymentsForDomain(req, res) {
-        let uId = req.query.userId;
-        let dId = req.query.domainId;
-
+    function checkPermissions(req, res, next) {
         let resolverName = getResolverName();
-        resolvers[resolverName](paymentsService.readAllUserPaymentsForDomain(uId, dId), res, 200);
-    }
-
-    function pay(req, res) {
-        let uId = req.params.userId;
-        let domainId = req.body.domainId;
-        let sum = req.body.sum;
         
-        let resolverName = getResolverName();
-        resolvers[resolverName](paymentsService.pay(uId, domainId, sum), res, 201);
+        let freeAccessRoutes = ["/sessions", "/users"];
+        let isFreeAccessRoute = freeAccessRoutes.some(elem => (req.url == elem) || (req.url == elem + '/'));
+        let isUserSigned = req.signedCookies[config.cookies.tokenKey] == undefined ? false : true;
+        
+        if (isUserSigned) req.decodedToken = jwt.verify(req.signedCookies[config.cookies.tokenKey], config.jwt.secret);
+
+        if (isFreeAccessRoute || isUserSigned) next();
+        else res.error(errors.accessDenied);
     }
 
     function promiseResolverJson(promise, res, status) {
@@ -45,4 +40,4 @@ function PaymentRouter(express, paymentsService, config) {
     }
 }
 
-module.exports = PaymentRouter;
+module.exports = PermissionRouter;

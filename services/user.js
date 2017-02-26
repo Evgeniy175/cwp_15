@@ -27,7 +27,7 @@ class UserService {
             this._encodeUserPassword(user);
             
             this.usersRepository.create(user)
-                .then(resolve)
+                .then(data => resolve({success:true}))
                 .catch(reject);
         });
     }
@@ -114,7 +114,7 @@ class UserService {
             this._encodeUserPassword(u);
 
             this.usersRepository.update(u, { where: { id }, limit: 1 })
-                .then(resolve)
+                .then(data => resolve({success:true}))
                 .catch(reject);
         });
     }
@@ -122,7 +122,7 @@ class UserService {
     remove(id) {
         return new Promise((resolve, reject) => {
             this.usersRepository.destroy({ where: { id } })
-                .then(resolve)
+                .then(data => resolve({success:true}))
                 .catch(reject);
         });
     }

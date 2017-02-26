@@ -16,7 +16,7 @@ class SessionService {
                 .then((user) => {
                     if (user == null) { reject(this.errors.wrongCredentials); return; }
 
-                    if (this.bcrypt.compareSync(u.password, user.dataValues.password)) { resolve(user.dataValues.id); }
+                    if (this.bcrypt.compareSync(u.password, user.dataValues.password)) { resolve({user: user.dataValues}); }
                     else { reject(this.errors.wrongCredentials); }
                 })
                 .catch(reject);

@@ -20,13 +20,18 @@ class PaymentService {
         return new Promise((resolve, reject) => {
             if (userId == null || userId == undefined) reject(this.errors.invalidId);
 
-            this.userDomainsRepository.findOne({where: {userId}})
-                .then(rows => {
-                    rows.getPayments()
-                        .then(p => resolve(p));
-                })
+            this.userDomainsRepository.findOne({where: {userId, domainId}})
+                .then(ud => { ud.getPayments().then(p => { resolve(this._getPaymentsData(p)); }) })
                 .catch(reject);
         });
+    }
+
+    _getPaymentsData(payments) {
+        let rc = [];
+
+        for (let p of payments) rc.push(p.dataValues);
+
+        return rc;
     }
 
     pay(userId, domainId, sum) {
@@ -48,9 +53,9 @@ class PaymentService {
                 .then((ud) => {
                     if (ud == null) { reject(this.errors.badUserDomain); }
 
-                    this.userPaymentsRepository.create({ userDomainId: ud.dataValues.id, sum });
+                    return this.userPaymentsRepository.create({ userDomainId: ud.dataValues.id, sum });
                 })
-                .then(resolve)
+                .then(data => resolve(data.dataValues))
                 .catch(reject);
         });
     }

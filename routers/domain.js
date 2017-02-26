@@ -1,8 +1,13 @@
 function DomainRouter(express, domainsService, config) {
+    const resolvers = {
+        'xml': promiseResolverXml,
+        'json': promiseResolverJson
+    };
+    const defaultResolver = 'json';
+
     let router = express.Router();
 
     router.get('/', readMany);
-    router.get('/is-available', isAvailable);
 
     router.get('/:domainId', read);
     router.post('/', buy);
@@ -12,35 +17,45 @@ function DomainRouter(express, domainsService, config) {
     return router;
 
     function readMany(req, res) {
-        promiseResolver(domainsService.readMany(req.query), res);
+        let resolverName = getResolverName();
+        resolvers[resolverName](domainsService.readMany(req.query), res, 200);
     }
 
     function read(req, res) {
-        promiseResolver(domainsService.read(req.params.domainId), res);
-    }
-
-    function isAvailable(req, res) {
-        promiseResolver(domainsService.isAvailable(req.query.domain), res);
+        let resolverName = getResolverName();
+        resolvers[resolverName](domainsService.read(req.params.domainId), res, 200);
     }
 
     function buy(req, res) {
         let uId = req.body.userId;
         let domain = req.body.domain;
-        promiseResolver(domainsService.buy(uId, domain), res);
+        let resolverName = getResolverName();
+
+        resolvers[resolverName](domainsService.buy(uId, domain), res, 200);
     }
 
     function update(req, res) {
-        promiseResolver(domainsService.update(req.params.domainId, req.body), res);
+        let resolverName = getResolverName();
+        resolvers[resolverName](domainsService.update(req.params.domainId, req.body), res, 200);
     }
 
     function remove(req, res) {
-        promiseResolver(domainsService.remove(req.params.domainId), res);
+        let resolverName = getResolverName();
+        resolvers[resolverName](domainsService.remove(req.params.domainId), res, 200);
     }
 
-    function promiseResolver(promise, res) {
-        promise
-            .then((data) => res.json(data))
-            .catch((err) => res.error(err));
+    function promiseResolverJson(promise, res, status) {
+        promise.then((data) => {res.status(status); res.json(data);})
+            .catch((err) => {res.error(err);});
+    }
+
+    function promiseResolverXml(promise, res, status) {
+        promise.then((data) => {res.xml(status, "data", data);})
+            .catch((err) => {res.error(err);});
+    }
+
+    function getResolverName() {
+        return config.settings.return in resolvers ? config.settings.return : defaultResolver;
     }
 }
 

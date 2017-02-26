@@ -15,6 +15,7 @@
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-alpha.2",
     "express": "^4.14.1",
+    "js2xmlparser": "^3.0.0",
     "jsonwebtoken": "^7.2.1",
     "mysql": "^2.13.0",
     "request": "^2.79.0",

@@ -17,14 +17,6 @@ class DomainService {
         };
     }
 
-    create(domain) {
-        return new Promise((resolve, reject) => {
-            this.domainRepository.create(domain)
-                .then(resolve)
-                .catch(reject);
-        });
-    }
-
     read(id) {
         id = parseInt(id);
 
@@ -37,7 +29,7 @@ class DomainService {
             this.domainRepository.findById(id)
                 .then((domain) => {
                     if (domain == null) reject(this.errors.notFound);
-                    else resolve(domain);
+                    else resolve(domain.dataValues);
                 })
                 .catch(reject);
         });
@@ -93,8 +85,8 @@ class DomainService {
                 return;
             }
             
-            this.domainRepository.update(d, { where: { id }, limit: 1 })
-                .then(resolve)
+            return this.domainRepository.update(d, { where: { id }, limit: 1 })
+                .then(data => {resolve({domain: d, action: 'update', success: true});})
                 .catch(reject);
         });
     }
@@ -102,23 +94,32 @@ class DomainService {
     remove(id) {
         return new Promise((resolve, reject) => {
             this.domainRepository.destroy({ where: { id } })
-                .then(resolve)
+                .then(data => resolve({domainId: id, action: 'delete', success: true}))
                 .catch(reject);
         });
     }
 
     isAvailable(domain) {
         let isDomainGood = domain != undefined && domain.length > 0;
-        let url = 'https://api.domainr.com/v2/status?domain=' + domain + '&client_id=' + this.config.domainRequest.key;
+        let options = {
+            url: 'https://api.domainr.com/v2/status?domain=' + domain + '&client_id=' + this.config.domainRequest.key,
+            headers: {
+                Origin: 'https://www.namecheap.com'
+            }
+        };
 
         return new Promise((resolve, reject) => {
-            if (!isDomainGood) reject(errors.badDomain);
+            if (!isDomainGood) reject(this.errors.badDomain);
 
-            this.request(url, function (err, response, body) {
-                if (err) reject(err);
+            this.request(options, (err, response, body) => {
+                if (err) {reject(this.errors.noConnection); return;}
 
                 let result = JSON.parse(response.body);
-                resolve(result.status[0].status != 'active');
+
+                if (result.errors) {reject(this.errors.badDomain); return;}
+                if (!result.status) {reject(this.errors.badRequest); return;}
+
+                resolve({domain, isAvailable: result.status[0].status != 'active'});
             });
         });
     }
@@ -132,12 +133,12 @@ class DomainService {
 
             if (validationErrors.length > 0) { reject(validationErrors); return; }
 
-            this.userRepository.findById(userId)
+            return this.userRepository.findById(userId)
                 .then((user) => {
                     if (user == undefined) { reject(this.errors.invalidId); }
                     else { return this._tryAddUserDomain(user, domain); }
                 })
-                .then(resolve)
+                .then(data => resolve(data.dataValues))
                 .catch(reject);
         });
     }
@@ -150,7 +151,7 @@ class DomainService {
             .then(values => {
                 if (!values[0] || values[1] != null) throw this.errors.domainNotAvailable;
 
-                user.createDomain({ name: domain });
+                return user.createDomain({ name: domain });
             });
     }
 

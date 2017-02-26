@@ -1,17 +1,3 @@
-const express = require('express');
-
-express.response.error = function(error) {
-    if (!error.code) {
-        error = {
-            message: error.toString(),
-            code: 'server_error',
-            status: 500
-        };
-    }
-
-    this.status(error.status).json(error);
-};
-
 module.exports = {
     invalidId: {
         message: 'Invalid id',
@@ -33,6 +19,11 @@ module.exports = {
         code: 'entity_not_found',
         status: 404
     },
+    noConnection: {
+        message: 'No connection',
+        code: 'no_connection',
+        status: 500
+    },
     invalidEntity: {
         message: 'Unprocessable entity',
         code: 'invalid_entity',
@@ -51,6 +42,11 @@ module.exports = {
     badUserDomain: {
         message: 'User doesn\'t have selected domain',
         code: 'bad_user_domain',
+        status: 400
+    },
+    badRequest: {
+        message: 'Bad request',
+        code: 'bad_request',
         status: 400
     }
 };

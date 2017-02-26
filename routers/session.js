@@ -1,49 +1,58 @@
-function AuthRouter(express, sessionsService, usersService, jwt, config, errors) {
-    let freeAccessRoutes = ["/sign-up", "/sign-in", "/logout"];
+function SessionRouter(express, sessionsService, jwt, config, errors) {
+    const resolvers = {
+        xml: xmlRepsonce,
+        json: jsonReposonce
+    };
+
+    const defaultResolver = 'json';
 
     let router = express.Router();
-
-    router.get('*', checkPermissions);
-    router.post('*', checkPermissions);
-
-    router.post('/sign-up', signUp);
-
-    router.post('/sign-in', signIn);
-
-    router.get('/logout', logout);
+    
+    router.post('/', signIn);
+    router.delete('/', logout);
 
     return router;
 
-    function checkPermissions(req, res, next) {
-        let isFreeAccessRoute = freeAccessRoutes.some((elem) => req.url.startsWith(elem));
-        let isUserSigned = req.signedCookies[config.cookies.tokenKey] == undefined ? false : true;
-        
-        if (isUserSigned) req.decodedToken = jwt.verify(req.signedCookies[config.cookies.tokenKey], config.jwt.secret);
-
-        if (isFreeAccessRoute || isUserSigned) next();
-        else res.json(errors.accessDenied);
-    }
-
-    function signUp(req, res) {
-        usersService.create(req.body)
-            .then((data) => res.json(data))
-            .catch((err) => res.error(err));
-    }
-
     function signIn(req, res) {
         sessionsService.signIn(req.body)
-            .then((userId) => {
-                let token = jwt.sign(userId, config.jwt.secret);
+            .then((data) => {
+                let token = jwt.sign(data.user.id, config.jwt.secret);
                 res.cookie(config.cookies.tokenKey, token, {signed: true});
-                res.json(userId);
+
+                let resolverName = getResolverName();
+                resolvers[resolverName](res, _getUserForReposonce(data.user), 200);
             })
             .catch((err) => res.error(err));
     }
 
+    function _getUserForReposonce(user) {
+        return {
+            id: user.id,
+            firstname: user.firstname,
+            lastname: user.lastname
+        };
+    }
+
     function logout(req, res) {
+        let resolverName = getResolverName();
+
         res.cookie(config.cookies.tokenKey, '');
-        res.end();
+
+        resolvers[resolverName](res, {success:true}, 200);
+    }
+
+    function xmlRepsonce(res, data, status) {
+        res.xml(status, 'data', data);
+    }
+
+    function jsonReposonce(res, data, status) {
+        res.status(200);
+        res.json(data);
+    }
+
+    function getResolverName() {
+        return config.settings.return in resolvers ? config.settings.return : defaultResolver;
     }
 }
 
-module.exports = AuthRouter;
+module.exports = SessionRouter;

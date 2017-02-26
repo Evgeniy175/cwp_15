@@ -1,33 +1,20 @@
-function PaymentRouter(express, paymentsService, config) {
+function AvailableDomainsRouter(express, domainsService, config) {
     const resolvers = {
         'xml': promiseResolverXml,
         'json': promiseResolverJson
     };
-
+    
     const defaultResolver = 'json';
 
     let router = express.Router();
-    
-    router.get('/', readAllUserPaymentsForDomain);
-    router.post('/:userId', pay);
+
+    router.get('/', isAvailable);
 
     return router;
 
-    function readAllUserPaymentsForDomain(req, res) {
-        let uId = req.query.userId;
-        let dId = req.query.domainId;
-
+    function isAvailable(req, res) {
         let resolverName = getResolverName();
-        resolvers[resolverName](paymentsService.readAllUserPaymentsForDomain(uId, dId), res, 200);
-    }
-
-    function pay(req, res) {
-        let uId = req.params.userId;
-        let domainId = req.body.domainId;
-        let sum = req.body.sum;
-        
-        let resolverName = getResolverName();
-        resolvers[resolverName](paymentsService.pay(uId, domainId, sum), res, 201);
+        resolvers[resolverName](domainsService.isAvailable(req.query.domain), res, 200);
     }
 
     function promiseResolverJson(promise, res, status) {
@@ -45,4 +32,4 @@ function PaymentRouter(express, paymentsService, config) {
     }
 }
 
-module.exports = PaymentRouter;
+module.exports = AvailableDomainsRouter;
