@@ -55,6 +55,6 @@ app.use('/domains', domainRouter);
 app.use('/payments', paymentRouter);
 app.use('/available-domains', availableDomainsRouter);
 
-app.listen(3000, function() {
+app.listen(process.env.PORT || 3000, function() {
     console.log('Server running...');
 });
