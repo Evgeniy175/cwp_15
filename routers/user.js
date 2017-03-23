@@ -18,7 +18,7 @@ function UserRouter(express, config, usersService) {
 
     function signUp(req, res) {
         let resolverName = getResolverName();
-        resolvers[resolverName](usersService.create(req.body), res, 201);
+        resolvers[resolverName](usersService.create(req.body.message), res, 201);
     }
 
     function readMany(req, res) {
@@ -33,7 +33,7 @@ function UserRouter(express, config, usersService) {
 
     function update(req, res) {
         let resolverName = getResolverName();
-        resolvers[resolverName](usersService.update(req.params.id, req.body), res, 204);
+        resolvers[resolverName](usersService.update(req.params.id, req.body.message), res, 204);
     }
 
     function remove(req, res) {
