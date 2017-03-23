@@ -21,6 +21,8 @@ function DbContext(Sequelize, config) {
     
     UserDomains.hasMany(UserPayments, { foreignKey: 'userDomainId', as: 'payments' });
 
+    sequelize.sync();
+
     return {
       users: Users,
       domains: Domains,
