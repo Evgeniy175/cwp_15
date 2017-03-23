@@ -1,7 +1,7 @@
 function DbContext(Sequelize, config) {
     let options = {
       host: config.db.host,
-      dialect: 'mysql',
+      dialect: 'postgres',
       logging: false,
       define: {
         timestamps: true,
