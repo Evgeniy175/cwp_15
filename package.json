@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-	  "start": "node app.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "E.Ryabchenko",
@@ -19,6 +19,7 @@
     "js2xmlparser": "^3.0.0",
     "jsonwebtoken": "^7.2.1",
     "mysql": "^2.13.0",
+    "pg": "^6.1.5",
     "request": "^2.79.0",
     "sequelize": "^3.30.1"
   }
