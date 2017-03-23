@@ -2,6 +2,7 @@ function DbContext(Sequelize, config) {
     let options = {
       host: config.db.host,
       dialect: config.db.dialect,
+      dialectOptions: { ssl: true },
       logging: false,
       define: {
         timestamps: true,
