@@ -13,8 +13,8 @@ function PermissionRouter(express, jwt, config, errors) {
 
     function checkPermissions(req, res, next) {
         let freeAccessRoutes = ["/sessions", "/users"];
-        let isFreeAccessRoute = freeAccessRoutes.some(elem => (req.url == elem) || (req.url == elem + '/'));
-        let isUserSigned = req.signedCookies[config.cookies.tokenKey] == undefined ? false : true;
+        let isFreeAccessRoute = freeAccessRoutes.some(elem => req.url == elem);
+        let isUserSigned = req.signedCookies[config.cookies.tokenKey] ? true : false;
         
         if (isUserSigned) req.decodedToken = jwt.verify(req.signedCookies[config.cookies.tokenKey], config.jwt.secret);
 
@@ -23,13 +23,9 @@ function PermissionRouter(express, jwt, config, errors) {
     }
 
     function resolveDataFormat(req, res, next) {
-        if (req.headers.accept.includes('json')) {
-            req.format = 'json';
-        } else if (req.headers.accept.includes('xml')) {
-            req.format = 'xml';
-        } else {
-            req.format = config.settings.return;
-        }
+        if (req.headers.accept.includes('json')) req.format = 'json';
+        else if (req.headers.accept.includes('xml')) req.format = 'xml';
+        else req.format = config.settings.return;
 
         next();
     }
