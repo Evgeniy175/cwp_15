@@ -12,7 +12,7 @@ function PermissionRouter(express, jwt, config, errors) {
     return router;
 
     function checkPermissions(req, res, next) {
-        let freeAccessRoutes = ["/sessions", "/users"];
+        let freeAccessRoutes = ['/sessions', '/users'];
         let isFreeAccessRoute = freeAccessRoutes.some(elem => req.url == elem);
         let isUserSigned = req.signedCookies[config.cookies.tokenKey] ? true : false;
         
@@ -36,7 +36,7 @@ function PermissionRouter(express, jwt, config, errors) {
     }
 
     function promiseResolverXml(promise, res, status) {
-        promise.then((data) => {res.xml(status, "data", data);})
+        promise.then((data) => {res.xml(status, 'data, data);})
             .catch((err) => {res.error(err);});
     }
 }
