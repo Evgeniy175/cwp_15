@@ -17,23 +17,28 @@ function UserRouter(express, config, usersService) {
     return router;
 
     function signUp(req, res) {
-        resolvers[req.format](usersService.create(req.body.message), res, 201);
+        let resolverName = getResolverName();
+        resolvers[resolverName](usersService.create(req.body.message), res, 201);
     }
 
     function readMany(req, res) {
-        resolvers[req.format](usersService.readMany(req.query), res, 200);
+        let resolverName = getResolverName();
+        resolvers[resolverName](usersService.readMany(req.query), res, 200);
     }
 
     function read(req, res) {
-        resolvers[req.format](usersService.read(req.params.id), res, 200);
+        let resolverName = getResolverName();
+        resolvers[resolverName](usersService.read(req.params.id), res, 200);
     }
 
     function update(req, res) {
-        resolvers[req.format](usersService.update(req.params.id, req.body.message), res, 204);
+        let resolverName = getResolverName();
+        resolvers[resolverName](usersService.update(req.params.id, req.body.message), res, 204);
     }
 
     function remove(req, res) {
-        resolvers[req.format](usersService.remove(req.params.id), res, 200);
+        let resolverName = getResolverName();
+        resolvers[resolverName](usersService.remove(req.params.id), res, 200);
     }
 
     function promiseResolverJson(promise, res, status) {
@@ -44,6 +49,10 @@ function UserRouter(express, config, usersService) {
     function promiseResolverXml(promise, res, status) {
         promise.then((data) => {res.xml(status, "data", data);})
             .catch((err) => {res.error(err);});
+    }
+
+    function getResolverName() {
+        return config.settings.return in resolvers ? config.settings.return : defaultResolver;
     }
 }
 

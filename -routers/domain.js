@@ -3,6 +3,7 @@ function DomainRouter(express, domainsService, config) {
         'xml': promiseResolverXml,
         'json': promiseResolverJson
     };
+    const defaultResolver = 'json';
 
     let router = express.Router();
 
@@ -16,25 +17,31 @@ function DomainRouter(express, domainsService, config) {
     return router;
 
     function readMany(req, res) {
-        resolvers[req.format](domainsService.readMany(req.query), res, 200);
+        let resolverName = getResolverName();
+        resolvers[resolverName](domainsService.readMany(req.query), res, 200);
     }
 
     function read(req, res) {
-        resolvers[req.format](domainsService.read(req.params.domainId), res, 200);
+        let resolverName = getResolverName();
+        resolvers[resolverName](domainsService.read(req.params.domainId), res, 200);
     }
 
     function buy(req, res) {
-        let uId = req.body.message.userId;
-        let domain = req.body.message.domain;
-        resolvers[req.format](domainsService.buy(uId, domain), res, 200);
+        let uId = req.body.userId;
+        let domain = req.body.domain;
+        let resolverName = getResolverName();
+
+        resolvers[resolverName](domainsService.buy(uId, domain), res, 200);
     }
 
     function update(req, res) {
-        resolvers[req.format](domainsService.update(req.params.domainId, req.body.message), res, 200);
+        let resolverName = getResolverName();
+        resolvers[resolverName](domainsService.update(req.params.domainId, req.body), res, 200);
     }
 
     function remove(req, res) {
-        resolvers[req.format](domainsService.remove(req.params.domainId), res, 200);
+        let resolverName = getResolverName();
+        resolvers[resolverName](domainsService.remove(req.params.domainId), res, 200);
     }
 
     function promiseResolverJson(promise, res, status) {
@@ -45,6 +52,10 @@ function DomainRouter(express, domainsService, config) {
     function promiseResolverXml(promise, res, status) {
         promise.then((data) => {res.xml(status, "data", data);})
             .catch((err) => {res.error(err);});
+    }
+
+    function getResolverName() {
+        return config.settings.return in resolvers ? config.settings.return : defaultResolver;
     }
 }
 

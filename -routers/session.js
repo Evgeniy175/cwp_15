@@ -1,8 +1,10 @@
 function SessionRouter(express, sessionsService, jwt, config, errors) {
     const resolvers = {
-        'xml': xmlRepsonce,
-        'json': jsonReposonce
+        xml: xmlRepsonce,
+        json: jsonReposonce
     };
+
+    const defaultResolver = 'json';
 
     let router = express.Router();
     
@@ -12,12 +14,13 @@ function SessionRouter(express, sessionsService, jwt, config, errors) {
     return router;
 
     function signIn(req, res) {
-        sessionsService.signIn(req.body.message)
+        sessionsService.signIn(req.body)
             .then((data) => {
                 let token = jwt.sign(data.user.id, config.jwt.secret);
                 res.cookie(config.cookies.tokenKey, token, {signed: true});
 
-                resolvers[req.format](res, _getUserForReposonce(data.user), 200);
+                let resolverName = getResolverName();
+                resolvers[resolverName](res, _getUserForReposonce(data.user), 200);
             })
             .catch((err) => res.error(err));
     }
@@ -31,9 +34,11 @@ function SessionRouter(express, sessionsService, jwt, config, errors) {
     }
 
     function logout(req, res) {
+        let resolverName = getResolverName();
+
         res.cookie(config.cookies.tokenKey, '');
 
-        resolvers[req.format](res, {success:true}, 200);
+        resolvers[resolverName](res, {success:true}, 200);
     }
 
     function xmlRepsonce(res, data, status) {
@@ -43,6 +48,10 @@ function SessionRouter(express, sessionsService, jwt, config, errors) {
     function jsonReposonce(res, data, status) {
         res.status(200);
         res.json(data);
+    }
+
+    function getResolverName() {
+        return config.settings.return in resolvers ? config.settings.return : defaultResolver;
     }
 }
 

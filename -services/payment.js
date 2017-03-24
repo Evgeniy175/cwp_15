@@ -29,12 +29,8 @@ class PaymentService {
     _getPaymentsData(userDomain) {
         return new Promise((resolve, reject) => {
             userDomain.getPayments()
-                .then(p => { resolve(this._getResultsForPayments(p)); })
+                .then(p => { resolve(p.map(elem => elem.dataValues)); })
         });
-    }
-
-    _getResultsForPayments(p) {
-        return {payments: p.map(elem => elem.dataValues)};
     }
 
     pay(userId, domainId, sum) {
