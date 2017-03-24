@@ -36,7 +36,7 @@ function PermissionRouter(express, jwt, config, errors) {
     }
 
     function promiseResolverXml(promise, res, status) {
-        promise.then((data) => {res.xml(status, 'data, data);})
+        promise.then((data) => {res.xml(status, 'data', data);})
             .catch((err) => {res.error(err);});
     }
 }
