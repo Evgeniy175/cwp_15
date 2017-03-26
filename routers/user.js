@@ -42,7 +42,8 @@ function UserRouter(express, config, usersService) {
     }
 
     function promiseResolverXml(promise, res, status) {
-        promise.then((data) => {res.xml(status, "data", data);})
+        promise.then((data) => {
+            res.xml(status, "data", data);})
             .catch((err) => {res.error(err);});
     }
 }

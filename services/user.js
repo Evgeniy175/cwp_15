@@ -113,7 +113,7 @@ class UserService {
             
             this._encodeUserPassword(u);
 
-            this.usersRepository.update(u, { where: { id }, limit: 1 })
+            return this.usersRepository.update(u, { where: { id }, limit: 1 })
                 .then(data => resolve({success:true}))
                 .catch(reject);
         });
