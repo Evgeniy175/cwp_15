@@ -29,7 +29,7 @@ function UserRouter(express, config, usersService) {
     }
 
     function update(req, res) {
-        resolvers[req.format](usersService.update(req.params.id, req.body.message), res, 204);
+        resolvers[req.format](usersService.update(req.params.id, req.body.message), res, 200);
     }
 
     function remove(req, res) {
@@ -42,8 +42,7 @@ function UserRouter(express, config, usersService) {
     }
 
     function promiseResolverXml(promise, res, status) {
-        promise.then((data) => {
-            res.xml(status, "data", data);})
+        promise.then((data) => { res.xml(status, "data", data);})
             .catch((err) => {res.error(err);});
     }
 }
