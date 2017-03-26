@@ -49,7 +49,7 @@ class UserService {
             this.usersRepository.findById(id)
                 .then((user) => {
                     if (user == null) reject(this.errors.notFound);
-                    else resolve(user);
+                    else resolve(user.dataValues);
                 })
                 .catch(reject);
         });

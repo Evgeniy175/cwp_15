@@ -6,6 +6,9 @@
         "pass": "NodeJS",
         "dialect": "mysql"
     },
+    "db_options": {
+
+    },
     "cookies": {
         "tokenKey": "token_key",
         "secret": "token_secret"
