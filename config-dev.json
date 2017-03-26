@@ -1,0 +1,22 @@
+{
+    "db": {
+        "host": "localhost",
+        "name": "pscpa_sem6_lab2",
+        "user": "NodeJS",
+        "pass": "NodeJS",
+        "dialect": "mysql"
+    },
+    "cookies": {
+        "tokenKey": "token_key",
+        "secret": "token_secret"
+    },
+    "domainRequest": {
+        "key": "fb7aca826b084569a50cfb3157e924ae"
+    },
+    "jwt": {
+        "secret": "mega_secure_key"
+    },
+    "settings": {
+        "return": "xml"
+    }
+}

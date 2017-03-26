@@ -9,7 +9,8 @@ const Js2XmlParser = require('js2xmlparser');
 
 const Request = require('request');
 
-const Config = require('./config');
+const CONFIG_PATH = process.env.NODE_ENV === 'production' ? './config' : './config-dev';
+const Config = require(CONFIG_PATH);
 const Errors = require('./helpers/errors');
 const DbContext = require('./helpers/sequelize');
 const ExpressExtensions = require('./helpers/express')(Express, Config, Js2XmlParser);
