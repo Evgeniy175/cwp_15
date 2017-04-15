@@ -27,7 +27,7 @@ class UserService {
             this._encodeUserPassword(user);
             
             this.usersRepository.create(user)
-                .then(data => resolve({success:true}))
+                .then(data => resolve({success: true}))
                 .catch(reject);
         });
     }
