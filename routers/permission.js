@@ -23,8 +23,12 @@ function PermissionRouter(express, jwt, config, errors) {
     }
 
     function resolveDataFormat(req, res, next) {
-        if (req.headers.accept.includes('json')) req.format = 'json';
-        else if (req.headers.accept.includes('xml')) req.format = 'xml';
+        if (!req.headers.accept) req.headers.accept = [config.settings.return];
+
+        const accept = req.headers.accept;
+
+        if (accept.includes('json')) req.format = 'json';
+        else if (accept.includes('xml')) req.format = 'xml';
         else req.format = config.settings.return;
 
         next();

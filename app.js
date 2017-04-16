@@ -30,6 +30,7 @@ const AvailableDomainsRouter = require('./routers/available-domains');
 // -- // -- // -- // -- // -- // -- // -- // -- // -- // -- // -- // -- // -- //
 
 const app = Express();
+
 const context = new DbContext(Sequelize, Config);
 
 const sessionsService = new SessionService(context.users, BCrypt, Config, Errors);
@@ -56,6 +57,8 @@ app.use('/domains', domainRouter);
 app.use('/payments', paymentRouter);
 app.use('/available-domains', availableDomainsRouter);
 
-app.listen(process.env.PORT || 3000, function() {
+const server = app.listen(process.env.PORT || 3000, function() {
     console.log('Server running...');
 });
+
+module.exports = server;

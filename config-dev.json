@@ -20,6 +20,6 @@
         "secret": "mega_secure_key"
     },
     "settings": {
-        "return": "xml"
+        "return": "json"
     }
 }

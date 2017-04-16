@@ -20,8 +20,8 @@ function DbContext(Sequelize, config) {
     Users.belongsToMany(Domains, { through: UserDomains });
     
     UserDomains.hasMany(UserPayments, { foreignKey: 'userDomainId', as: 'payments' });
-
-    sequelize.sync();
+  
+    if (options.host != 'localhost') sequelize.sync();
 
     return {
       users: Users,
