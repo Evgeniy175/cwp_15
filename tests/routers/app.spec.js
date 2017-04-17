@@ -8,13 +8,12 @@ describe('app tests', async () => {
     server.close();
     done();
   });
-
+/*
   ////////////////////////////////////
   // available-domains tests        //
   ////////////////////////////////////
 
   it('>> domain-available router: is available domain', async () => {
-    
     const user = TestsBase.generateUser();
     await signUp(user);
 
@@ -191,7 +190,7 @@ describe('app tests', async () => {
     await deleteRequest(`/domains/${resBuy.id}`, 200, token);
 
     const readResult = await get(`/domains/${resBuy.id}`, 404, token);
-  });
+  });*/
 });
 
 
