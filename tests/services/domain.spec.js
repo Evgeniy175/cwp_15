@@ -92,6 +92,7 @@ describe('Tests domains service', async () => {
   }
 
   it('>> remove test', async () => {
+    throw 'REMOVE DOMAIN TEST SHOULD FAIL!!1'
     let isDeleteErrorThrowed = false;
 
     const user = TestsBase.generateUser();
