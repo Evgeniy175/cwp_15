@@ -11,7 +11,7 @@ const usersRepo = new UsersRepository();
 
 const UserService = require('../../services/user');
 const service = new UserService(usersRepo, BCrypt, Config, Errors);
-
+/*
 describe('Tests users service', async () => {
   beforeEach(() => usersRepo.mockClear());
 
@@ -81,4 +81,4 @@ describe('Tests users service', async () => {
 
     expect(isDeleteErrorThrowed).toBeTruthy();
   });
-});
+});*/

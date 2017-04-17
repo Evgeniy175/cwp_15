@@ -2,13 +2,13 @@ const TestsBase = require('../base');
 const server = require('../../app');
 const request = require('supertest');
 const Errors = require('../../helpers/errors');
-
+/*
 describe('app tests', async () => {
   afterEach(done => {
     server.close();
     done();
   });
-/*
+
   ////////////////////////////////////
   // available-domains tests        //
   ////////////////////////////////////
@@ -190,8 +190,8 @@ describe('app tests', async () => {
     await deleteRequest(`/domains/${resBuy.id}`, 200, token);
 
     const readResult = await get(`/domains/${resBuy.id}`, 404, token);
-  });*/
-});
+  });
+});*/
 
 
 
