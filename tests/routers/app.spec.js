@@ -14,6 +14,7 @@ describe('app tests', async () => {
   ////////////////////////////////////
 
   it('>> domain-available router: is available domain', async () => {
+    
     const user = TestsBase.generateUser();
     await signUp(user);
 
